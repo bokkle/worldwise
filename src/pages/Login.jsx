@@ -1,16 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './Login.module.css';
 import PageNav from '../components/PageNav';
+import { useAuth } from '../contexts/FakeAuthContext';
+import Button from '../components/Button';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   // PRE-FILL FOR DEV PURPOSES
-  const [email, setEmail] = useState('jack@example.com');
+  const [email, setEmail] = useState('chad@example.com');
   const [password, setPassword] = useState('qwerty');
+
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (email && password) login(email, password);
+  };
+
+  useEffect(() => {
+    //{repalce: true} replaces the history of being on the login page
+    //when user presses back arrow within /app, they will go back to
+    //homepage instead of login page (which would otherwise instantly
+    //redirect them back to /app)
+    if (isAuthenticated) navigate('/app', { replace: true });
+  }, [isAuthenticated, navigate]);
 
   return (
     <main className={styles.login}>
       <PageNav />
-      <form className={styles.form}>
+      <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.row}>
           <label htmlFor="email">Email address</label>
           <input
@@ -32,7 +51,7 @@ export default function Login() {
         </div>
 
         <div>
-          <button>Login</button>
+          <Button type="primary">Login</Button>
         </div>
       </form>
     </main>
